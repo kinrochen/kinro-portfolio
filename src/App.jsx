@@ -648,7 +648,7 @@ export function App() {
   }, [filter, lang, routeNoteId, routeNotesPage, routeProjectPage, galleryProjectId]);
 
   useEffect(() => {
-    function handlePopState() {
+    function syncRouteState() {
       const nextNoteId = getRouteNoteId();
       const nextNotesPage = getRouteNotesPage();
       const nextProjectPage = getRouteProjectPage();
@@ -668,9 +668,18 @@ export function App() {
       }
     }
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', syncRouteState);
+    window.addEventListener('hashchange', syncRouteState);
+    return () => {
+      window.removeEventListener('popstate', syncRouteState);
+      window.removeEventListener('hashchange', syncRouteState);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!(routeNoteId || routeNotesPage || routeProjectPage)) return;
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [routeNoteId, routeNotesPage, routeProjectPage]);
 
   useEffect(() => {
     if (routeNoteId || routeNotesPage || routeProjectPage) return undefined;

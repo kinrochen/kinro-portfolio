@@ -2709,11 +2709,12 @@ a:focus-visible {
   .lab-header {
     top: 12px;
     display: grid;
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     grid-template-areas:
-      "brand nav"
-      ". controls";
-    gap: 10px;
+      "brand . controls"
+      "nav nav nav";
+    align-items: center;
+    gap: 8px 10px;
   }
 
   .brand {
@@ -2772,7 +2773,11 @@ a:focus-visible {
   }
 
   .section {
-    padding: 82px 18px 64px;
+    padding: 72px 18px 56px;
+  }
+
+  .work-section {
+    padding-top: 48px;
   }
 
   .note-page,
@@ -2780,27 +2785,27 @@ a:focus-visible {
     width: auto;
     min-height: 100vh;
     margin: 0;
-    padding: 118px 18px 40px;
+    padding: 108px 18px 36px;
   }
 
   .project-page {
     width: auto;
     min-height: 100vh;
     margin: 0;
-    padding: 118px 18px 40px;
+    padding: 108px 18px 36px;
   }
 
   .note-page-surface {
-    min-height: calc(100vh - 158px);
-    padding: 30px 22px;
-    border-radius: 26px;
+    min-height: calc(100vh - 144px);
+    padding: 24px 20px;
+    border-radius: 24px;
   }
 
   .note-page-head {
     align-items: flex-start;
     flex-direction: column-reverse;
-    gap: 14px;
-    margin-bottom: 32px;
+    gap: 12px;
+    margin-bottom: 24px;
   }
 
   .project-page-head {
@@ -2810,11 +2815,20 @@ a:focus-visible {
   }
 
   .note-page-surface h1 {
-    font-size: 50px;
+    max-width: 100%;
+    font-size: 39px;
+    line-height: 1.04;
   }
 
   .note-page-summary {
-    font-size: 27px;
+    margin-top: 18px;
+    font-size: 21px;
+    line-height: 1.34;
+  }
+
+  .note-page-divider {
+    width: 100%;
+    margin: 24px 0;
   }
 
   .note-page-body.markdown-body {
@@ -2823,18 +2837,22 @@ a:focus-visible {
   }
 
   .note-page-body.markdown-body h2 {
-    font-size: 29px;
+    font-size: 28px;
   }
 
   .hero-lab {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-content: start;
+    row-gap: 14px;
     min-height: auto;
     padding-top: 128px;
-    padding-bottom: 78px;
+    padding-bottom: 30px;
+    overflow: hidden;
   }
 
   .hero-lab::after {
-    inset: 98px 12px 34px 12px;
+    inset: 110px 10px 12px 10px;
     border-radius: 28px;
     clip-path: none;
   }
@@ -2842,9 +2860,9 @@ a:focus-visible {
   .hero-blueprint {
     left: 18px;
     right: 18px;
-    bottom: 54px;
-    font-size: 92px;
-    opacity: 0.11;
+    bottom: 4px;
+    font-size: 72px;
+    opacity: 0.052;
   }
 
   .hero-copy::before {
@@ -2857,23 +2875,27 @@ a:focus-visible {
     grid-column: 1;
     grid-row: auto;
     margin-top: 0;
+    max-width: 100%;
   }
 
   .hero-command {
     grid-column: 1;
     grid-row: auto;
     width: 100%;
-    margin-top: 0;
+    margin-top: 8px;
     margin-bottom: 0;
   }
 
   .hero-copy h1 {
-    font-size: 58px;
+    max-width: 100%;
+    margin-bottom: 0;
+    font-size: clamp(50px, 14vw, 58px);
+    line-height: 0.84;
     overflow-wrap: anywhere;
   }
 
   .hero-name {
-    row-gap: 8px;
+    row-gap: 6px;
   }
 
   .hero-name-line.is-offset {
@@ -2886,8 +2908,8 @@ a:focus-visible {
   }
 
   .hero-lead {
-    font-size: 22px;
-    line-height: 1.3;
+    font-size: clamp(20px, 5.7vw, 23px);
+    line-height: 1.24;
     text-wrap: auto;
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -2902,35 +2924,67 @@ a:focus-visible {
   }
 
   .hero-system {
-    grid-column: 1;
-    grid-row: auto;
-    position: relative;
-    top: auto;
-    right: auto;
+    position: absolute;
+    top: 238px;
+    right: -108px;
     bottom: auto;
-    z-index: auto;
-    width: 100%;
+    z-index: 0;
+    width: min(330px, 86vw);
+    height: 330px;
     display: block;
     min-height: auto;
-    pointer-events: auto;
+    opacity: 0.38;
+    pointer-events: none;
   }
 
   .lab-stage {
     inset: 0;
-    border-radius: 26px;
+    border-radius: 28px;
     clip-path: none;
+    mask-image: radial-gradient(ellipse 78% 62% at 62% 48%, black 0 58%, rgba(0, 0, 0, 0.76) 69%, transparent 88%);
+    -webkit-mask-image: radial-gradient(ellipse 78% 62% at 62% 48%, black 0 58%, rgba(0, 0, 0, 0.76) 69%, transparent 88%);
   }
 
   .lab-view {
-    height: 320px;
+    height: 100%;
     min-height: 0;
     padding: 0;
-    border-radius: 26px;
+    border-radius: 28px;
     clip-path: none;
   }
 
   .lab-stage img {
     object-position: 68% center;
+  }
+
+  .command-line {
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 10px;
+  }
+
+  .command-line code {
+    max-width: calc(100vw - 178px);
+    padding: 5px 8px;
+    overflow: hidden;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .primary-action,
+  .ghost-action {
+    min-height: 48px;
+    padding: 0 14px;
+    font-size: 14px;
+    white-space: nowrap;
   }
 
   .hero-orbit {
@@ -2981,7 +3035,12 @@ a:focus-visible {
 
   .section-heading {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .section-heading p {
+    margin-bottom: 0;
   }
 
   .filter-panel {
@@ -2989,8 +3048,10 @@ a:focus-visible {
   }
 
   .project-bento {
+    width: 100%;
     grid-template-columns: 1fr;
-    grid-auto-rows: 330px;
+    grid-auto-rows: 270px;
+    gap: 14px;
   }
 
   .project-tile.is-large {
@@ -2998,9 +3059,28 @@ a:focus-visible {
     grid-row: span 1;
   }
 
+  .project-tile button {
+    border-radius: 26px;
+  }
+
+  .project-tile img {
+    object-position: center center;
+  }
+
   .project-tile.is-large strong,
   .project-tile strong {
-    font-size: 38px;
+    left: 20px;
+    right: 20px;
+    bottom: 58px;
+    font-size: 34px;
+    text-align: center;
+  }
+
+  .project-tile em {
+    left: 22px;
+    right: 66px;
+    font-size: 13px;
+    text-align: center;
   }
 
   .work-more-button {
@@ -3011,6 +3091,7 @@ a:focus-visible {
   }
 
   .project-showcase {
+    grid-template-columns: 1fr;
     min-height: 0;
     border-radius: 28px;
   }
@@ -3025,7 +3106,8 @@ a:focus-visible {
   }
 
   .project-showcase-copy h1 {
-    font-size: 54px;
+    font-size: 44px;
+    line-height: 0.96;
   }
 
   .project-showcase-copy p:not(.eyebrow) {
@@ -3034,11 +3116,11 @@ a:focus-visible {
   }
 
   .project-showcase-visual {
-    min-height: 280px;
+    min-height: 220px;
   }
 
   .project-showcase-visual img {
-    min-height: 280px;
+    min-height: 220px;
   }
 
   .project-album {
@@ -3059,7 +3141,8 @@ a:focus-visible {
 
   .section-heading h2,
   .contact-copy h2 {
-    font-size: 44px;
+    font-size: 37px;
+    line-height: 1;
   }
 
   .tile-type {
@@ -3069,10 +3152,60 @@ a:focus-visible {
   .process-grid,
   .notes-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .process-card {
+    min-height: 220px;
+    padding: 22px;
+    border-radius: 24px;
+  }
+
+  .process-card svg {
+    margin: 28px 0 18px;
+  }
+
+  .process-card h3,
+  .note h3 {
+    font-size: 28px;
+  }
+
+  .note {
+    min-height: 300px;
+    padding: 22px;
+    border-radius: 24px;
+  }
+
+  .note.now img {
+    height: 148px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .note.now .note-copy {
+    padding: 19px 20px 22px;
+  }
+
+  .note.now h3 {
+    font-size: 25px;
+  }
+
+  .notes-more {
+    width: 100%;
   }
 
   .contact-panel > a span {
-    font-size: 30px;
+    font-size: 26px;
+  }
+
+  .contact-lab {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding-bottom: 72px;
+  }
+
+  .contact-copy {
+    min-height: auto;
+    padding: 0;
   }
 
   .drawer-card h2 {
@@ -3100,15 +3233,16 @@ a:focus-visible {
 
 @media (max-width: 560px) {
   .lab-header {
-    right: auto;
-    width: min(354px, calc(100vw - 36px));
+    left: 14px;
+    right: 14px;
+    width: auto;
   }
 
   .section {
-    width: min(390px, 100vw);
-    max-width: 390px;
+    width: 100%;
+    max-width: none;
     margin-left: 0;
-    margin-right: auto;
+    margin-right: 0;
   }
 
   .hero-lab {
@@ -3121,7 +3255,7 @@ a:focus-visible {
 
 @media (max-width: 440px) {
   .hero-lab {
-    padding-top: 120px;
+    padding-top: 126px;
   }
 
   .hero-copy h1 {
@@ -3133,16 +3267,19 @@ a:focus-visible {
   }
 
   .hero-lead {
-    font-size: 22px;
-    line-height: 1.18;
+    font-size: 20px;
+    line-height: 1.25;
   }
 
-  .hero-actions {
-    display: grid;
+  .hero-system {
+    top: 232px;
+    right: -112px;
+    width: min(320px, 90vw);
+    height: 318px;
   }
 
   .project-bento {
-    grid-auto-rows: 310px;
+    grid-auto-rows: 252px;
   }
 
 }
