@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.npm-cache/
+.npmrc
+
+.DS_Store
+*.log
+
+.env
+.env.*
+!.env.example
+
+.idea/
+qa/
+asset-contact-sheet.jpg

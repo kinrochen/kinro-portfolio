@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="shell" x1="10" y1="7" x2="55" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#63e5ff" />
+      <stop offset="0.52" stop-color="#7ff5cf" />
+      <stop offset="1" stop-color="#f2c879" />
+    </linearGradient>
+    <radialGradient id="glow" cx="22" cy="18" r="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.52" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#070a0f" />
+  <rect x="6" y="6" width="52" height="52" rx="15" fill="url(#shell)" opacity="0.22" />
+  <rect x="6" y="6" width="52" height="52" rx="15" fill="url(#glow)" />
+  <path d="M18 46V18h6.7v11.2L36.2 18h8.2L31.8 30.2 45.6 46h-8.5L26.9 34l-2.2 2.2V46H18Zm30 0h-6.8V18H48v28Z" fill="#eef7fb" />
+  <path d="M13 51h38" stroke="#7ff5cf" stroke-width="2.4" stroke-linecap="round" opacity="0.82" />
+</svg>
