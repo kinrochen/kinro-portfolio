@@ -325,6 +325,7 @@ img {
 .theme-toggle {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   height: 40px;
   padding: 0 13px;
@@ -334,6 +335,11 @@ img {
   font-size: 12px;
   font-weight: 800;
   transition: transform 220ms ease, border-color 220ms ease;
+}
+
+.theme-toggle svg {
+  display: block;
+  flex: 0 0 auto;
 }
 
 .theme-toggle:hover {
@@ -1158,6 +1164,26 @@ img {
   background:
     linear-gradient(180deg, rgba(6, 9, 13, 0.12), rgba(6, 9, 13, 0.52)),
     linear-gradient(90deg, rgba(5, 8, 12, 0.64), transparent 72%);
+}
+
+:root[data-theme='light'] .project-tile button {
+  border-color: color-mix(in srgb, var(--accent) 30%, rgba(37, 55, 70, 0.2));
+  background: #e9f1f4;
+  box-shadow: 0 26px 74px rgba(66, 84, 96, 0.2), 0 0 42px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+:root[data-theme='light'] .project-tile img {
+  filter: brightness(1.1) saturate(1.06) contrast(1.02);
+}
+
+:root[data-theme='light'] .project-tile:hover img {
+  filter: brightness(1.12) saturate(1.12) contrast(1.04);
+}
+
+:root[data-theme='light'] .tile-glow {
+  background:
+    linear-gradient(180deg, rgba(7, 11, 15, 0.12) 0%, rgba(7, 11, 15, 0.02) 30%, rgba(7, 11, 15, 0.08) 58%, rgba(7, 11, 15, 0.4) 100%),
+    linear-gradient(90deg, rgba(7, 11, 15, 0.2), transparent 58%);
 }
 
 .tile-index,
@@ -2846,13 +2872,13 @@ a:focus-visible {
     align-content: start;
     row-gap: 14px;
     min-height: auto;
-    padding-top: 128px;
+    padding-top: 148px;
     padding-bottom: 30px;
     overflow: hidden;
   }
 
   .hero-lab::after {
-    inset: 110px 10px 12px 10px;
+    inset: 122px 10px 12px 10px;
     border-radius: 28px;
     clip-path: none;
   }
@@ -2925,7 +2951,7 @@ a:focus-visible {
 
   .hero-system {
     position: absolute;
-    top: 238px;
+    top: 258px;
     right: -108px;
     bottom: auto;
     z-index: 0;
@@ -3255,7 +3281,7 @@ a:focus-visible {
 
 @media (max-width: 440px) {
   .hero-lab {
-    padding-top: 126px;
+    padding-top: 146px;
   }
 
   .hero-copy h1 {
@@ -3272,7 +3298,7 @@ a:focus-visible {
   }
 
   .hero-system {
-    top: 232px;
+    top: 252px;
     right: -112px;
     width: min(320px, 90vw);
     height: 318px;
