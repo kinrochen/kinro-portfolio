@@ -35,6 +35,12 @@ function getAppPathname() {
   return pathname;
 }
 
+function getAppRoutePath() {
+  if (typeof window === 'undefined') return '/';
+  const hashPath = window.location.hash.startsWith('#/') ? window.location.hash.slice(1) : '';
+  return hashPath || getAppPathname();
+}
+
 const markdownComponents = {
   img({ node, src = '', alt = '', ...props }) {
     return <img {...props} src={publicPath(src)} alt={alt} />;
@@ -351,18 +357,18 @@ function ScrambleText({ text }) {
 
 function getRouteNoteId() {
   if (typeof window === 'undefined') return null;
-  const match = getAppPathname().match(/^\/notes\/([^/]+)\/?$/);
+  const match = getAppRoutePath().match(/^\/notes\/([^/]+)\/?$/);
   return match ? decodeURIComponent(match[1]) : null;
 }
 
 function getRouteNotesPage() {
   if (typeof window === 'undefined') return false;
-  return /^\/notes\/?$/.test(getAppPathname());
+  return /^\/notes\/?$/.test(getAppRoutePath());
 }
 
 function getRouteProjectPage() {
   if (typeof window === 'undefined') return false;
-  return /^\/projects\/?$/.test(getAppPathname());
+  return /^\/projects\/?$/.test(getAppRoutePath());
 }
 
 function MotionField({ theme }) {
@@ -539,7 +545,7 @@ export function App() {
   }
 
   function openNotePage(noteId) {
-    window.history.pushState({}, '', appPath(`/notes/${encodeURIComponent(noteId)}`));
+    window.history.pushState({}, '', appPath(`/#/notes/${encodeURIComponent(noteId)}`));
     setRouteNoteId(noteId);
     setRouteNotesPage(false);
     setRouteProjectPage(false);
@@ -549,7 +555,7 @@ export function App() {
   }
 
   function openNotesGallery() {
-    window.history.pushState({}, '', appPath('/notes'));
+    window.history.pushState({}, '', appPath('/#/notes'));
     setRouteNoteId(null);
     setRouteNotesPage(true);
     setRouteProjectPage(false);
@@ -559,7 +565,7 @@ export function App() {
   }
 
   function openProjectGallery(projectId = featuredProjectId || projects[0].id) {
-    window.history.pushState({}, '', appPath('/projects'));
+    window.history.pushState({}, '', appPath('/#/projects'));
     setGalleryProjectId(projectId);
     setSelectedId(null);
     setRouteNoteId(null);
