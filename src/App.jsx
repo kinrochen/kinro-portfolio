@@ -271,6 +271,65 @@ const process = [
 
 const navTargets = ['intro', 'work', 'process', 'notes', 'contact'];
 const sectionIds = ['intro', 'work', 'process', 'notes', 'contact'];
+const siteUrl = 'https://kinrochen.top';
+const defaultShareImage = `${siteUrl}/og-image.png`;
+const defaultSeo = {
+  title: 'Kinro Chen | AI 原生创造者与 Vibe Coder',
+  description: 'Kinro Chen 的个人作品集，记录 AI 原生产品、Vibe Coding 项目、Obsidian 插件、AI 招聘系统、提示词管理和本地优先 AI 相册实验。',
+  path: '/',
+  image: defaultShareImage,
+  type: 'website',
+};
+
+function sitePath(path = '/') {
+  const normalizedPath = path === '/' ? '/' : `/${path.replace(/^\/|\/$/g, '')}/`;
+  return new URL(normalizedPath, siteUrl).toString();
+}
+
+function setMetaContent(selector, content, createAttributes = {}) {
+  if (!content) return;
+  let element = document.head.querySelector(selector);
+  if (!element) {
+    element = document.createElement('meta');
+    Object.entries(createAttributes).forEach(([key, value]) => element.setAttribute(key, value));
+    document.head.appendChild(element);
+  }
+  element.setAttribute('content', content);
+}
+
+function setCanonical(href) {
+  let element = document.head.querySelector('link[rel="canonical"]');
+  if (!element) {
+    element = document.createElement('link');
+    element.setAttribute('rel', 'canonical');
+    document.head.appendChild(element);
+  }
+  element.setAttribute('href', href);
+}
+
+function updateDocumentSeo(pageSeo, lang) {
+  const title = pageSeo.title || defaultSeo.title;
+  const description = pageSeo.description || defaultSeo.description;
+  const canonical = sitePath(pageSeo.path || '/');
+  const image = pageSeo.image || defaultShareImage;
+  const type = pageSeo.type || 'website';
+  const locale = lang === 'zh' ? 'zh_CN' : 'en_US';
+
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.title = title;
+  setCanonical(canonical);
+  setMetaContent('meta[name="description"]', description, { name: 'description' });
+  setMetaContent('meta[name="robots"]', pageSeo.robots || 'index, follow', { name: 'robots' });
+  setMetaContent('meta[property="og:type"]', type, { property: 'og:type' });
+  setMetaContent('meta[property="og:locale"]', locale, { property: 'og:locale' });
+  setMetaContent('meta[property="og:title"]', title, { property: 'og:title' });
+  setMetaContent('meta[property="og:description"]', description, { property: 'og:description' });
+  setMetaContent('meta[property="og:url"]', canonical, { property: 'og:url' });
+  setMetaContent('meta[property="og:image"]', image, { property: 'og:image' });
+  setMetaContent('meta[name="twitter:title"]', title, { name: 'twitter:title' });
+  setMetaContent('meta[name="twitter:description"]', description, { name: 'twitter:description' });
+  setMetaContent('meta[name="twitter:image"]', image, { name: 'twitter:image' });
+}
 
 function parseFrontmatter(source) {
   const match = source.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
@@ -529,6 +588,62 @@ export function App() {
   const pageNote = routeNoteId ? notes.find((note) => note.id === routeNoteId) : null;
   const visibleNotes = notes.slice(0, 3);
   const hasNotes = notes.length > 0;
+  const pageSeo = useMemo(() => {
+    if (routeNoteId) {
+      if (!pageNote) {
+        return {
+          title: lang === 'zh' ? '没有找到这篇笔记 | Kinro Chen' : 'Note not found | Kinro Chen',
+          description: lang === 'zh' ? '这篇笔记可能已经被移动或重命名。' : 'This note may have been moved or renamed.',
+          path: `/notes/${routeNoteId}`,
+          image: defaultShareImage,
+          type: 'website',
+          robots: 'noindex, follow',
+        };
+      }
+      return {
+        title: `${pageNote[lang].title} | Kinro Chen`,
+        description: pageNote[lang].summary || defaultSeo.description,
+        path: `/notes/${pageNote.id}`,
+        image: defaultShareImage,
+        type: 'article',
+      };
+    }
+
+    if (routeNotesPage) {
+      return {
+        title: lang === 'zh' ? '笔记 | Kinro Chen' : 'Notes | Kinro Chen',
+        description:
+          lang === 'zh'
+            ? 'Kinro Chen 的 AI 产品、Vibe Coding、知识管理和开发实践笔记。'
+            : 'Notes on AI products, vibe coding, knowledge capture, and product engineering by Kinro Chen.',
+        path: '/notes',
+        image: defaultShareImage,
+        type: 'website',
+      };
+    }
+
+    if (routeProjectPage) {
+      return {
+        title:
+          lang === 'zh'
+            ? `${galleryProject[lang].title} | Vibe Coding 项目`
+            : `${galleryProject[lang].title} | Vibe Coding Projects`,
+        description: galleryProject[lang].description,
+        path: '/projects',
+        image: defaultShareImage,
+        type: 'website',
+      };
+    }
+
+    return {
+      ...defaultSeo,
+      title: lang === 'zh' ? defaultSeo.title : 'Kinro Chen | AI-native Builder & Vibe Coder',
+      description:
+        lang === 'zh'
+          ? defaultSeo.description
+          : 'Kinro Chen’s personal portfolio for AI-native products, vibe coding projects, Obsidian plugins, AI recruiting systems, prompt management, and local-first AI albums.',
+    };
+  }, [galleryProject, lang, pageNote, routeNoteId, routeNotesPage, routeProjectPage]);
 
   function goToSection(id) {
     setActiveSection(id);
@@ -545,7 +660,7 @@ export function App() {
   }
 
   function openNotePage(noteId) {
-    window.history.pushState({}, '', appPath(`/#/notes/${encodeURIComponent(noteId)}`));
+    window.history.pushState({}, '', appPath(`/notes/${encodeURIComponent(noteId)}`));
     setRouteNoteId(noteId);
     setRouteNotesPage(false);
     setRouteProjectPage(false);
@@ -555,7 +670,7 @@ export function App() {
   }
 
   function openNotesGallery() {
-    window.history.pushState({}, '', appPath('/#/notes'));
+    window.history.pushState({}, '', appPath('/notes'));
     setRouteNoteId(null);
     setRouteNotesPage(true);
     setRouteProjectPage(false);
@@ -565,7 +680,7 @@ export function App() {
   }
 
   function openProjectGallery(projectId = featuredProjectId || projects[0].id) {
-    window.history.pushState({}, '', appPath('/#/projects'));
+    window.history.pushState({}, '', appPath('/projects'));
     setGalleryProjectId(projectId);
     setSelectedId(null);
     setRouteNoteId(null);
@@ -632,6 +747,10 @@ export function App() {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('kinro-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    updateDocumentSeo(pageSeo, lang);
+  }, [lang, pageSeo]);
 
   useEffect(() => {
     const revealObserver = new IntersectionObserver(
