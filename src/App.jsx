@@ -8,11 +8,13 @@ import {
   BracketsAngle,
   Compass,
   GithubLogo,
+  MagnifyingGlass,
   MoonStars,
   PencilLine,
   SunDim,
   X,
 } from '@phosphor-icons/react';
+import { buildSearchIndex, searchItems } from './search.js';
 
 const appBasePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
@@ -78,6 +80,22 @@ const copy = {
     theme: 'Theme',
     light: 'Light',
     dark: 'Dark',
+    search: {
+      trigger: 'Search',
+      title: 'Command search',
+      eyebrow: 'Find anything',
+      placeholder: 'Search projects, notes, stack, keywords...',
+      hint: 'Projects, notes, stack, and bilingual keywords',
+      shortcut: 'Press / or Ctrl K',
+      empty: 'No matching result',
+      emptyBody: 'Try a project name, AI, Obsidian, FastAPI, Go, prompt, or album.',
+      open: 'Open',
+      suggestions: 'Suggested',
+      results: 'Results',
+      project: 'Project',
+      note: 'Note',
+      section: 'Profile',
+    },
     filters: {
       all: 'All',
       products: 'Products',
@@ -121,6 +139,22 @@ const copy = {
     theme: '主题',
     light: '浅色',
     dark: '深色',
+    search: {
+      trigger: '搜索',
+      title: '命令搜索',
+      eyebrow: '快速找到',
+      placeholder: '搜索项目、笔记、技术栈、关键词...',
+      hint: '支持项目、笔记、技术栈和中英文关键词',
+      shortcut: '按 / 或 Ctrl K',
+      empty: '没有匹配结果',
+      emptyBody: '可以试试项目名、AI、Obsidian、FastAPI、Go、提示词或相册。',
+      open: '打开',
+      suggestions: '推荐',
+      results: '结果',
+      project: '项目',
+      note: '笔记',
+      section: '简介',
+    },
     filters: {
       all: '全部',
       products: '产品',
@@ -546,8 +580,24 @@ function resetHeroPointer(event) {
   element.style.setProperty('--hero-y', '50%');
 }
 
+function localizeSearchItem(item, lang) {
+  return {
+    ...item,
+    title: item.title?.[lang] || item.title?.en || item.title?.zh || item.id,
+    description: item.description?.[lang] || item.description?.en || item.description?.zh || '',
+    eyebrow: item.eyebrow?.[lang] || item.eyebrow?.en || item.eyebrow?.zh || '',
+  };
+}
+
+function getResultIcon(kind) {
+  if (kind === 'note') return PencilLine;
+  if (kind === 'section') return Compass;
+  return BracketsAngle;
+}
+
 export function App() {
   const dockFrameRef = useRef(null);
+  const searchInputRef = useRef(null);
   const [lang, setLang] = useState('zh');
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'dark';
@@ -556,12 +606,22 @@ export function App() {
   const [filter, setFilter] = useState('all');
   const [activeSection, setActiveSection] = useState('intro');
   const [selectedId, setSelectedId] = useState(null);
+  const [isSearchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeSearchIndex, setActiveSearchIndex] = useState(0);
   const [routeNoteId, setRouteNoteId] = useState(() => getRouteNoteId());
   const [routeNotesPage, setRouteNotesPage] = useState(() => getRouteNotesPage());
   const [routeProjectPage, setRouteProjectPage] = useState(() => getRouteProjectPage());
   const [galleryProjectId, setGalleryProjectId] = useState('memoir');
   const [pendingSectionId, setPendingSectionId] = useState(null);
   const t = copy[lang];
+  const searchIndex = useMemo(() => buildSearchIndex({ projects, notes, process }), []);
+  const searchResults = useMemo(() => searchItems(searchIndex, searchQuery, lang, 9), [lang, searchIndex, searchQuery]);
+  const searchSuggestions = useMemo(
+    () => searchIndex.filter((item) => item.kind !== 'section').slice(0, 6).map((item) => localizeSearchItem(item, lang)),
+    [lang, searchIndex],
+  );
+  const commandResults = searchQuery.trim() ? searchResults : searchSuggestions;
 
   useEffect(() => {
     return () => {
@@ -743,6 +803,72 @@ export function App() {
     setRouteProjectPage(false);
   }
 
+  function closeSearch() {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setActiveSearchIndex(0);
+  }
+
+  function getSearchKindLabel(kind) {
+    if (kind === 'note') return t.search.note;
+    if (kind === 'section') return t.search.section;
+    return t.search.project;
+  }
+
+  function openSearchResult(result) {
+    if (!result) return;
+    closeSearch();
+
+    if (result.kind === 'note') {
+      openNotePage(result.targetId);
+      return;
+    }
+
+    if (result.kind === 'section') {
+      goToSection(result.targetId);
+      return;
+    }
+
+    setSelectedId(result.targetId);
+    setActiveSection('work');
+    if (routeNoteId || routeNotesPage || routeProjectPage) {
+      window.history.pushState({}, '', appPath('/#work'));
+      setRouteNoteId(null);
+      setRouteNotesPage(false);
+      setRouteProjectPage(false);
+      setPendingSectionId('work');
+      return;
+    }
+
+    window.history.replaceState({}, '', appPath('/#work'));
+    scrollToId('work');
+  }
+
+  function handleSearchKeyDown(event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeSearch();
+      return;
+    }
+
+    if (!commandResults.length) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveSearchIndex((index) => (index + 1) % commandResults.length);
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveSearchIndex((index) => (index - 1 + commandResults.length) % commandResults.length);
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      openSearchResult(commandResults[activeSearchIndex]);
+    }
+  }
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('kinro-theme', theme);
@@ -751,6 +877,38 @@ export function App() {
   useEffect(() => {
     updateDocumentSeo(pageSeo, lang);
   }, [lang, pageSeo]);
+
+  useEffect(() => {
+    setActiveSearchIndex(0);
+  }, [searchQuery, lang]);
+
+  useEffect(() => {
+    if (!isSearchOpen) return undefined;
+    const frame = window.requestAnimationFrame(() => searchInputRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    function handleGlobalSearchShortcut(event) {
+      const tagName = event.target?.tagName?.toLowerCase();
+      const isTypingTarget = ['input', 'textarea', 'select'].includes(tagName) || event.target?.isContentEditable;
+      const key = event.key.toLowerCase();
+
+      if ((event.metaKey || event.ctrlKey) && key === 'k') {
+        event.preventDefault();
+        setSearchOpen(true);
+        return;
+      }
+
+      if (event.key === '/' && !isTypingTarget && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalSearchShortcut);
+    return () => window.removeEventListener('keydown', handleGlobalSearchShortcut);
+  }, []);
 
   useEffect(() => {
     const revealObserver = new IntersectionObserver(
@@ -867,6 +1025,17 @@ export function App() {
         </nav>
 
         <div className="controls">
+          <button
+            className="search-trigger"
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-label={t.search.title}
+            aria-keyshortcuts="Control+K Meta+K /"
+          >
+            <MagnifyingGlass size={17} />
+            <span>{t.search.trigger}</span>
+            <kbd>/</kbd>
+          </button>
           <div className="segmented" aria-label="Language switcher">
             <button type="button" className={lang === 'zh' ? 'active' : ''} onClick={() => setLang('zh')}>
               中文
@@ -1211,6 +1380,99 @@ export function App() {
         </div>
       </footer>
         </>
+      )}
+
+      {isSearchOpen && (
+        <div className="search-dialog" role="presentation">
+          <button className="search-backdrop" type="button" onClick={closeSearch} aria-label={t.close} />
+          <section
+            className="search-modal glass-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="search-title"
+            onKeyDown={handleSearchKeyDown}
+          >
+            <div className="search-modal-head">
+              <p className="eyebrow">{t.search.eyebrow}</p>
+              <button className="drawer-close" type="button" onClick={closeSearch} aria-label={t.close}>
+                <X size={18} />
+              </button>
+            </div>
+            <form
+              className="search-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                openSearchResult(commandResults[activeSearchIndex]);
+              }}
+            >
+              <label className="search-field" htmlFor="global-search">
+                <MagnifyingGlass size={22} />
+                <span id="search-title">{t.search.title}</span>
+                <input
+                  id="global-search"
+                  ref={searchInputRef}
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder={t.search.placeholder}
+                  autoComplete="off"
+                  spellCheck="false"
+                  aria-controls="search-results"
+                />
+              </label>
+            </form>
+            <div className="search-meta">
+              <span>{t.search.hint}</span>
+              <kbd>{t.search.shortcut}</kbd>
+            </div>
+
+            <div className="search-results-head">
+              <strong>{searchQuery.trim() ? t.search.results : t.search.suggestions}</strong>
+              <span>{commandResults.length}</span>
+            </div>
+
+            {commandResults.length ? (
+              <div className="search-results" id="search-results" role="listbox">
+                {commandResults.map((result, index) => {
+                  const Icon = getResultIcon(result.kind);
+                  return (
+                    <button
+                      className={`search-result ${index === activeSearchIndex ? 'active' : ''}`}
+                      type="button"
+                      key={`${result.kind}-${result.id}`}
+                      onClick={() => openSearchResult(result)}
+                      onMouseEnter={() => setActiveSearchIndex(index)}
+                      role="option"
+                      aria-selected={index === activeSearchIndex}
+                    >
+                      <span className="search-result-icon" style={{ '--accent': result.accent || 'var(--cyan)' }}>
+                        <Icon size={20} weight="thin" />
+                      </span>
+                      <span className="search-result-copy">
+                        <span>
+                          <em>{getSearchKindLabel(result.kind)}</em>
+                          {result.eyebrow && <small>{result.eyebrow}</small>}
+                        </span>
+                        <strong>{result.title}</strong>
+                        {result.description && <p>{result.description}</p>}
+                      </span>
+                      <span className="search-result-action">
+                        {t.search.open}
+                        <ArrowRight size={16} />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="search-empty">
+                <MagnifyingGlass size={28} />
+                <strong>{t.search.empty}</strong>
+                <p>{t.search.emptyBody}</p>
+              </div>
+            )}
+          </section>
+        </div>
       )}
 
       {selectedProject && (
