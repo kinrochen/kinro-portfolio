@@ -11,7 +11,7 @@ const defaultSeo = {
   path: '/',
   type: 'website',
   title: 'Kinro Chen | AI 原生创造者与 Vibe Coder',
-  description: 'Kinro Chen 的个人作品集，记录 AI 原生产品、Vibe Coding 项目、Obsidian 插件、AI 招聘系统、提示词管理和本地优先 AI 相册实验。',
+  description: 'Kinro Chen 的个人作品集，记录 AI 原生产品、Vibe Coding 项目、Obsidian 插件、AI 内容发布、AI 招聘系统、提示词管理和本地优先 AI 相册实验。',
   image: defaultImage,
 };
 
@@ -88,7 +88,7 @@ function buildSeoBlock(page) {
   return `<!-- SEO_META_START -->
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="${escapeHtml(description)}" />
-    <meta name="keywords" content="Kinro Chen, Vibe Coding, AI 产品, AI 原生创造者, React, Go, FastAPI, Obsidian 插件, Prompt Engineering" />
+    <meta name="keywords" content="Kinro Chen, Vibe Coding, AI 产品, AI 原生创造者, Galley Studio, AI 内容发布, React, Go, FastAPI, Obsidian 插件, Prompt Engineering" />
     <meta name="author" content="Kinro Chen" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="${escapeHtml(canonical)}" />
@@ -137,7 +137,7 @@ async function getNotePages() {
       date: frontmatter.date || undefined,
       title: `${frontmatter.title_zh || frontmatter.title_en || slug} | Kinro Chen`,
       description: frontmatter.summary_zh || frontmatter.summary_en || defaultSeo.description,
-      image: defaultImage,
+      image: frontmatter.image ? new URL(frontmatter.image, siteUrl).toString() : defaultImage,
     });
   }
 
@@ -169,7 +169,7 @@ const pages = [
     path: '/projects/',
     type: 'website',
     title: 'Vibe Coding 项目 | Kinro Chen',
-    description: '查看 Kinro Chen 的 AI 原生作品：AI 招聘管理、AI 故事相册、Obsidian 知识捕获、提示词版本管理等真实项目。',
+    description: '查看 Kinro Chen 的 AI 原生作品：Obsidian AI 内容发布、AI 招聘管理、AI 故事相册、知识捕获、提示词版本管理等真实项目。',
     image: defaultImage,
   },
   {

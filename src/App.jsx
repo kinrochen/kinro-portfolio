@@ -51,6 +51,7 @@ const markdownComponents = {
 
 const assets = {
   hero: publicPath('/assets/hero-paper-map.png'),
+  galleyStudio: publicPath('/assets/notes/galley-studio-console-and-theme-selection.png'),
   glint: publicPath('/assets/notes/glint-cover.png'),
   aiInterview: publicPath('/assets/notes/ai-interview-cover.png'),
   memoir: publicPath('/assets/notes/memoir-cover.png'),
@@ -191,6 +192,27 @@ const copy = {
 
 const projects = [
   {
+    id: 'galley-studio',
+    image: assets.galleyStudio,
+    url: 'https://github.com/kinrochen/Galley-Studio',
+    noteId: 'galley-studio-obsidian-ai-publishing-studio',
+    categories: ['tools'],
+    accent: '#f5a65b',
+    en: {
+      title: 'Galley Studio',
+      tagline: 'AI publishing studio for Obsidian',
+      description:
+        'An open-source Obsidian plugin that turns Markdown into editable, publication-ready HTML with AI layout, theme selection, visible generation traces, visual editing, source editing, and local file ownership.',
+      meta: 'Obsidian plugin / AI publishing',
+    },
+    zh: {
+      title: 'Galley Studio',
+      tagline: 'Obsidian AI 排版与发布工作台',
+      description: '开源 Obsidian 插件，把 Markdown 交给 AI 排版，并在同一工作台完成主题选择、生成过程查看、HTML 预览、可视化编辑、源码编辑与本地保存。',
+      meta: 'Obsidian 插件 / AI 内容发布',
+    },
+  },
+  {
     id: 'glint',
     image: assets.glint,
     url: 'https://github.com/kinrochen/obsidian-glint',
@@ -309,7 +331,7 @@ const siteUrl = 'https://kinrochen.top';
 const defaultShareImage = `${siteUrl}/og-image.png`;
 const defaultSeo = {
   title: 'Kinro Chen | AI 原生创造者与 Vibe Coder',
-  description: 'Kinro Chen 的个人作品集，记录 AI 原生产品、Vibe Coding 项目、Obsidian 插件、AI 招聘系统、提示词管理和本地优先 AI 相册实验。',
+  description: 'Kinro Chen 的个人作品集，记录 AI 原生产品、Vibe Coding 项目、Obsidian 插件、AI 内容发布、AI 招聘系统、提示词管理和本地优先 AI 相册实验。',
   path: '/',
   image: defaultShareImage,
   type: 'website',
@@ -664,7 +686,7 @@ export function App() {
         title: `${pageNote[lang].title} | Kinro Chen`,
         description: pageNote[lang].summary || defaultSeo.description,
         path: `/notes/${pageNote.id}`,
-        image: defaultShareImage,
+        image: pageNote.image ? new URL(pageNote.image, siteUrl).toString() : defaultShareImage,
         type: 'article',
       };
     }
@@ -701,7 +723,7 @@ export function App() {
       description:
         lang === 'zh'
           ? defaultSeo.description
-          : 'Kinro Chen’s personal portfolio for AI-native products, vibe coding projects, Obsidian plugins, AI recruiting systems, prompt management, and local-first AI albums.',
+          : 'Kinro Chen’s personal portfolio for AI-native products, vibe coding projects, Obsidian plugins, AI publishing, AI recruiting systems, prompt management, and local-first AI albums.',
     };
   }, [galleryProject, lang, pageNote, routeNoteId, routeNotesPage, routeProjectPage]);
 
